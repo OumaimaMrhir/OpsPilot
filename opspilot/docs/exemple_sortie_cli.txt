@@ -1,0 +1,12 @@
+18035 lignes de logs analysées
+
+[Agrégation  ]    21.5 ms  360 points de métriques
+[Détection   ]    50.0 ms  24 anomalies
+[Corrélation ]     5.1 ms  1 incident(s)
+[Triage IA   ]     0.1 ms  1 diagnostic(s)
+[ServiceNow  ]     0.0 ms  1 ticket(s) créé(s)
+[Remédiation ]     0.0 ms  exécutée (simulation)
+
+INC-0001 · payment-api · P1 · 09:30-09:42 · ticket INC1000010
+  Diagnostic (règles, confiance 100%) : payment-api dégradé de 09:30 à 09:42 (P1) : jusqu'à 49% d'erreurs et 1296 ms de latence p95. Cause probable : Le pool de connexions à la base est saturé (pic de charge ou connexions non libérées). Action : Redémarrer la révision active du service pour libérer les connexions.
+  Remédiation : exécutée (simulation) – [dry-run] scripts/Invoke-Remediation.ps1 -Action restart_service -IncidentId INC-0001

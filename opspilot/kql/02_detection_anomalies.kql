@@ -1,0 +1,12 @@
+// Détection d'anomalies sur le taux d'erreur avec la décomposition de séries temporelles native de KQL.
+let lookback = 2h;
+AppRequests
+| where TimeGenerated > ago(lookback)
+| make-series error_rate = avg(iff(Success == false, 1.0, 0.0)) default = 0.0
+    on TimeGenerated from ago(lookback) to now() step 1m
+    by AppRoleName
+| extend (flags, score, baseline) = series_decompose_anomalies(error_rate, 3.0, -1, 'linefit')
+| mv-expand TimeGenerated to typeof(datetime), error_rate to typeof(double), flags to typeof(int), score to typeof(double), baseline to typeof(double)
+| where flags == 1
+| project TimeGenerated, AppRoleName, error_rate = round(error_rate, 3), baseline = round(baseline, 3), score = round(score, 1)
+| order by TimeGenerated desc

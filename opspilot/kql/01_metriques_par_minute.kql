@@ -1,0 +1,11 @@
+// Taux d'erreur et latence p95 par service, par minute (Application Insights, mode workspace).
+// Équivalent du module Python opspilot.detection.aggregate.
+AppRequests
+| where TimeGenerated > ago(2h)
+| summarize
+    requests = count(),
+    errors = countif(Success == false),
+    p95_ms = percentile(DurationMs, 95)
+    by AppRoleName, bin(TimeGenerated, 1m)
+| extend error_rate = round(todouble(errors) / requests, 4)
+| order by AppRoleName asc, TimeGenerated asc

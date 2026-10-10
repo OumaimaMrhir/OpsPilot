@@ -1,0 +1,5 @@
+// Requête de l'alerte Azure Monitor (voir infra/terraform/main.tf) : services dépassant 10 % d'erreurs sur 5 minutes.
+AppRequests
+| where TimeGenerated > ago(5m)
+| summarize error_rate = 100.0 * countif(Success == false) / count() by AppRoleName
+| where error_rate > 10

@@ -1,0 +1,5 @@
+// Signatures d'erreurs les plus fréquentes sur la dernière heure : base du rapprochement avec les runbooks.
+AppExceptions
+| where TimeGenerated > ago(1h)
+| summarize occurrences = count(), last_seen = max(TimeGenerated) by AppRoleName, OuterMessage
+| top 10 by occurrences desc

@@ -1,0 +1,31 @@
+# Base de connaissances des runbooks : signatures d'erreurs connues -> cause probable et remédiation.
+# `automatable: true` = action sûre, exécutable automatiquement (liste blanche). Sinon : validation humaine.
+runbooks:
+  - id: RB-001
+    title: Saturation du pool de connexions à la base de données
+    patterns: ["connection pool exhausted", "acquiring connection from pool"]
+    probable_cause: Le pool de connexions à la base est saturé (pic de charge ou connexions non libérées).
+    action: restart_service
+    automatable: true
+    steps:
+      - Redémarrer la révision active du service pour libérer les connexions.
+      - Vérifier dans Log Analytics que le taux d'erreur revient sous 1 %.
+      - Si l'incident se reproduit, augmenter la taille du pool et analyser les requêtes lentes.
+  - id: RB-002
+    title: Erreurs 502 d'un service amont
+    patterns: ["http 502", "bad gateway"]
+    probable_cause: Un service amont est indisponible ou renvoie des erreurs.
+    action: escalate_upstream
+    automatable: false
+    steps:
+      - Identifier le service amont dans la trace distribuée.
+      - Escalader à l'équipe propriétaire du service amont.
+  - id: RB-003
+    title: Saturation mémoire
+    patterns: ["outofmemory", "out of memory", "oomkilled"]
+    probable_cause: Le conteneur dépasse sa limite mémoire.
+    action: scale_out
+    automatable: false
+    steps:
+      - Augmenter temporairement le nombre de réplicas.
+      - Analyser la consommation mémoire et corriger la fuite éventuelle.
